@@ -1,0 +1,4 @@
+try using a QStyleOption object
+
+
+

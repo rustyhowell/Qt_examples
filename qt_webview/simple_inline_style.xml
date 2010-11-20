@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet type="text/xsl" 
+  href="http://stamm-wilbrandt.de/en/xsl-list/ApplyEmbeddedStylesheetIE.xsl"?>
+<?xml-stylesheet type="text/xsl" href="#style1"?>
+
+<!DOCTYPE catalog [
+<!ATTLIST xsl:stylesheet id ID #REQUIRED>
+]>
+
+<catalog>
+
+<xsl:stylesheet id="style1" version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+ <xsl:template match="/">
+  <html>
+  <body>
+  <h2>My CD Collection</h2>
+  <table border="1">
+    <tr bgcolor="#9acd32">
+      <th>Title</th>
+      <th>Artist</th>
+    </tr>
+    <xsl:for-each select="//catalog/cd">
+    <tr>
+      <td><xsl:value-of select="title"/></td>
+      <td><xsl:value-of select="artist"/></td>
+    </tr>
+    </xsl:for-each>
+  </table>
+  </body>
+  </html>
+ </xsl:template>
+ <xsl:template match="xsl:stylesheet">
+  <!-- ignore -->
+ </xsl:template>
+</xsl:stylesheet>
+
+  <cd>
+    <title>Empire Burlesque</title>
+    <artist>Bob Dylan</artist>
+    <country>USA</country>
+    <company>Columbia</company>
+    <price>10.90</price>
+    <year>1985</year>
+  </cd>
+  <cd>
+    <title>The white album</title>
+    <artist>Beatles</artist>
+    <country>UK</country>
+    <company>apple</company>
+    <price>???</price>
+    <year>196?</year>
+  </cd>
+</catalog>
