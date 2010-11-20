@@ -178,13 +178,13 @@ void question5(QTreeWidget * tree)
 
 void question6(QTreeWidget * tree)
 {
+    tree->header()->setSortIndicatorShown(false);
     tree->setStyle(new MyStyle(tree->header(), tree->style())); // this work but applies to the application
     //tree1->setStyle(new MyStyle(tree1->header(), app.style())); // this work but applies to the application
 
     //tree1->setStyle(new MyStyle(&style));
     //tree1->setStyle(new MyStyle(tree1, NULL));
     tree->header()->setFixedHeight(100);
-    tree->header()->setSortIndicatorShown(false);
     tree->setSortingEnabled(true);
 
     QStringList headers;

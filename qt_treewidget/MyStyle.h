@@ -4,6 +4,10 @@
 #include <QTabWidget>
 #include <QStyle>
 
+
+// Drawing a QTreeWidget with vertical column headers.
+//
+
 // from http://developer.qt.nokia.com/faq/answer/how_can_i_display_vertical_text_in_the_section_of_a_qheaderview
 class MyStyle : public QProxyStyle
 {
@@ -13,37 +17,19 @@ class MyStyle : public QProxyStyle
         {
             Q_ASSERT(header);
             _header = header;
-            QString st = " QHeaderView::section {";
-            //st += "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-            //     "stop:0 #616161, stop: 0.5 #505050, stop: 0.6 #434343, stop:1 #656565); ";
-            //st += "color: blue;";
-            st += "padding-left: 4px;"; // does not affect vertical orientation
-            //st += "border: 1px solid #6c6c6c;";
-            st += "}";
-
-            //QString st = "QHeaderView::section:checked { background-color: red; }";
-            //QString st = "QHeaderView { color: red; }";
-
-            st += "QHeaderView::down-arrow { image: url(down_arrow.jpg); top: 40px;}";
-            // st += "QHeaderView::down-arrow { image: url(down_arrow.jpg);} ";
-            st += "QHeaderView::up-arrow { image: url(up_arrow.jpg); }";
-
-            header->setStyleSheet(st);
         }
 
         void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const
         {
-            if ((widget == _header) && (element == QStyle::CE_HeaderLabel)) {
-                /*
-                const QHeaderView *hv = qobject_cast<const QHeaderView *>(widget);
-                if (!hv || hv->orientation() != Qt::Horizontal)
-                {
-                    return QProxyStyle::drawControl(element, option, painter, widget);
-                }
-                */
+            /// Maybe I should use QStyle::CE_HeaderSection instead of CE_HeaderLabel?
+            //
+            if ((widget == _header) && (element == QStyle::CE_HeaderLabel))
+            {
+                //qDebug() << "drawing header text";
                 const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option);
-                //header->sortIndicator = QStyleOptionHeader::None;
                 painter->save();
+
+                /*** Draw the label text ***/
 
                 // Vertical column header reading down
                 //painter->translate(header->rect.topLeft());
@@ -51,14 +37,67 @@ class MyStyle : public QProxyStyle
                 //painter->drawText(0,0,header->text);
 
                 // Vertical column header reading up
+                int x, y, width, height;
+                option->rect.getRect(&x, &y, &width, &height);
                 painter->translate(header->rect.bottomLeft());
                 painter->rotate(270);
-                painter->drawText(0,20,header->text);
+                painter->drawText(40,40,header->text);
+                //painter->drawText(option->rect, Qt::AlignHCenter,header->text);
+                //painter->drawText(option->rect, Qt::AlignHCenter,header->text);
+
+                /*** Draw the sort indicator arrow ***/
+                //qDebug() << "drawing indicator header arrow";
+
+                // Load the appropriate pixmap
+                QPixmap pixmap;
+                if (header->sortIndicator == QStyleOptionHeader::SortUp)
+                {
+                    // using left and right arrow. Remember, the section has be rotated/translated
+                    // so up/down arrows are now sideways
+                    pixmap.load("arrow_right.png");
+                }
+                else
+                {
+                    pixmap.load("arrow_left.png");
+                }
+
+                // get the dimensions
+                // Here, rect is the drawing area for the arrow, which is a small area against the right 
+                // edge of the column header. I do not know the dimensions of the section (ie width, height).
+                // To draw the sort indicator in the center of the column header, need to implement this drawing in
+                // drawControl(CE_HeaderSection) and use the rect x,y,width,height values for the header section.
+
+                //option->rect.getRect(&x, &y, &width, &height);
+
+                //y = 50;
+                //qDebug() << QString("x=%1 y=%2 w=%3 h=%4").arg(x).arg(y).arg(width).arg(height);
+
+                // Draw the goods
+                //painter->translate(header->rect.bottomLeft());
+                //painter->drawPixmap(x + width - 40, y + height - 40, pixmap);
+                //painter->drawPixmap(x+width,y+height, pixmap);
+                painter->drawPixmap(10,10, pixmap);
 
                 // Finish up
                 painter->restore();
                 return;
             }
             return QProxyStyle::drawControl(element, option, painter, widget);
+        }
+
+        void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const
+        {
+            if ((widget == _header) && (element == QStyle::PE_IndicatorHeaderArrow))
+            {
+                // Drawing the PE_IndicatorHeaderArrow element puts the sort indicator arrow
+                // in the right side of the section header. I do not have acces to the dimensions of
+                // the section header from here, so I cannot guess how wide or tall the section is.
+                //
+                // So... if the PrimitiveElement QStyle::PE_IndicatorHeaderArrow is being drawn, don't.
+                return;
+            }
+
+            // If any other PrimitiveElement is being drawn, call the default drawing function
+            return QProxyStyle::drawPrimitive(element, option, painter, widget);
         }
 };
