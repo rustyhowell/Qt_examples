@@ -1,0 +1,8 @@
+Makefile
+*.o
+qt_crypto/qt_crypto
+qt_dir/qt_dir
+qt_hash/qt_hash
+qt_mkdir/qt_mkdir
+qt_treewidget/qt_treewidget
+string_split/string_split
